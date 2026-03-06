@@ -1,74 +1,77 @@
-# Job Portal Project - TODO List
+# Job Portal - Vercel Deployment Fix
 
-## Project Overview
-Build a complete Online Job Portal Website with HTML, CSS, JS frontend and Python Flask backend with SQLite database.
+## Issues Fixed
 
-## Phase 1: Project Structure Setup
-- [x] Create main project directory structure
-- [x] Create backend/ folder with app.py
-- [x] Create templates/ folder for HTML files
-- [x] Create templates/admin/ folder for admin pages
-- [x] Create static/css/ folder for styles
-- [x] Create static/js/ folder for scripts
-- [x] Create static/images/ folder for images
+### ✅ 1. Added Vercel WSGI Handler
+- Added `handler(event, context)` function in `backend/app.py`
+- This is required for Vercel's Python runtime to execute the Flask app
 
-## Phase 2: Backend Development
-- [x] Create Flask app (app.py) with configuration
-- [x] Set up SQLite database connection
-- [x] Create database tables (users, companies, jobs, applications)
-- [x] Implement user authentication (register, login, logout)
-- [x] Create API endpoints for jobs (/api/jobs, /api/add-job, etc.)
-- [x] Create API endpoints for companies
-- [x] Create API endpoints for applications
-- [x] Create admin routes for dashboard
-- [x] Add duplicate sample data for companies and jobs
+### ✅ 2. Fixed vercel.json Configuration
+- Updated Python version from 3.9 to 3.11 (required for Flask 3.0)
+- Added static file handling configuration
+- Added installCommand for pip
 
-## Phase 3: Frontend - Main Pages
-- [x] Create index.html (Home page with hero, search, featured companies)
-- [x] Create jobs.html (Job listings page)
-- [x] Create companies.html (Companies listing page)
-- [x] Create login.html (User login page)
-- [x] Create register.html (User registration page)
-- [x] Create apply.html (Job application form)
+### ✅ 3. Fixed Database Path
+- Database now uses `/tmp` directory on Vercel (ephemeral filesystem)
+- Falls back to local `backend/database.db` for development
 
-## Phase 4: Frontend - Admin Pages
-- [x] Create admin/dashboard.html (Admin dashboard)
-- [x] Create admin/add_job.html (Add new job)
-- [x] Create admin/manage_jobs.html (Edit/Delete jobs)
-- [x] Create admin/applications.html (View applications)
+### ✅ 4. Added Error Handling
+- All routes wrapped in try/catch blocks
+- Returns proper JSON error responses instead of crashing
 
-## Phase 5: CSS Styling
-- [x] Create style.css (Main styles with modern UI/UX)
-- [x] Create admin.css (Admin panel styles)
-- [x] Include responsive design
-- [x] Add hover animations
-- [x] Implement gradient backgrounds
+### ✅ 5. Fixed Python Version
+- Updated to Python 3.11 in both vercel.json and pyproject.toml
 
-## Phase 6: JavaScript Functionality
-- [x] Create script.js (Main JS for navigation, forms)
-- [x] Create jobs.js (Dynamic job loading with fetch API)
-- [x] Create admin.js (Admin functionality)
+## Deployment Instructions
 
-## Phase 7: Testing & Verification
-- [x] Install Flask and dependencies
-- [x] Run the application
-- [x] Test all pages load correctly
-- [x] Test job listing loads dynamically
-- [x] Test user registration and login
-- [x] Test admin functionality
+### Prerequisites
+1. Install Vercel CLI: `npm i -g vercel`
+2. Login to Vercel: `vercel login`
 
-## Technology Stack
-- Frontend: HTML5, CSS3, JavaScript
-- Backend: Python Flask
-- Database: SQLite
+### Deploy to Vercel
+```bash
+# Navigate to project directory
+cd c:/Users/DELL/OneDrive/Desktop/JobPortal
 
-## Database Tables
-1. users (id, name, email, password)
-2. companies (id, name, industry, location, email, description, logo, image)
-3. jobs (id, title, company, department, job_role, location, salary, job_type, description, company_email)
-4. applications (id, name, email, mobile, department, job_role, job_id, resume, message)
+# Deploy to Vercel
+vercel deploy --prod
+```
 
-## Sample Data Requirements
-- 6+ companies (Google, Amazon, Microsoft, TCS, Infosys, Wipro)
-- 10+ jobs across different roles (Software Developer, Python Developer, Web Developer, Data Analyst, UI/UX Designer)
+### Local Testing
+```bash
+# Run locally
+python backend/app.py
+
+# Access at http://127.0.0.1:5000
+```
+
+## Root Cause Explanation
+
+### What is FUNCTION_INVOCATION_FAILED?
+
+This error occurs when Vercel's serverless function fails to execute properly. The causes include:
+
+1. **Missing Handler Function**: Vercel Python runtime needs a `handler(event, context)` function as the entry point, not just `app.run()`
+
+2. **Database Path Issues**: SQLite database on Vercel must be in `/tmp` since the main filesystem is ephemeral (read-only)
+
+3. **Python Version Mismatch**: Flask 3.0 requires Python 3.10+, but the config specified 3.9
+
+4. **No Error Handling**: Unhandled exceptions crash the function without meaningful error messages
+
+### How Serverless Functions Work on Vercel
+
+- Each request triggers a new function instance
+- The function must return a dict with `statusCode`, `headers`, and `body`
+- Filesystem is ephemeral - changes are lost between invocations
+- Cold starts can cause delays on first request
+
+## Best Practices Applied
+
+1. ✅ Proper WSGI handler for Vercel
+2. ✅ Try/catch error handling on all routes
+3. ✅ Database in /tmp for Vercel compatibility
+4. ✅ Correct Python version (3.11)
+5. ✅ Static file configuration
+6. ✅ Environment-based configuration
 
