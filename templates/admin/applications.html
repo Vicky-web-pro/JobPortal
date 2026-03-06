@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications - Admin - JobPortal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <!-- Admin Sidebar -->
+    <div class="admin-sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> JobPortal</a>
+            </div>
+            <span class="admin-badge">Admin</span>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/admin/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/add-job">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Job</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/manage-jobs">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Manage Jobs</span>
+                </a>
+            </li>
+            <li class="active">
+                <a href="/admin/applications">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Applications</span>
+                </a>
+            </li>
+            <li>
+                <a href="/">
+                    <i class="fas fa-home"></i>
+                    <span>View Site</span>
+                </a>
+            </li>
+            <li>
+                <a href="/logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Admin Content -->
+    <div class="admin-content">
+        <!-- Top Header -->
+        <div class="admin-header">
+            <h1>Job Applications</h1>
+            <div class="header-stats">
+                <span class="total-count">Total: <strong id="totalApplications">0</strong></span>
+            </div>
+        </div>
+
+        <!-- Applications Table -->
+        <div class="admin-table-container">
+            <div class="table-header">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search applications...">
+                </div>
+            </div>
+
+            <table class="admin-table applications-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Job Role</th>
+                        <th>Applied Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="applicationsTableBody">
+                    <!-- Applications will be loaded dynamically -->
+                </tbody>
+            </table>
+
+            <!-- Loading State -->
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading applications...
+            </div>
+
+            <!-- No Results -->
+            <div class="no-results" id="noResults" style="display: none;">
+                <p>No applications found</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Application Modal -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Application Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="applicationDetails">
+                <!-- Application details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script>
+        let allApplications = [];
+
+        // Load applications on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadApplications();
+        });
+
+        function loadApplications() {
+            fetch('/api/applications')
+                .then(response => response.json())
+                .then(data => {
+                    allApplications = data;
+                    displayApplications(data);
+                    document.getElementById('totalApplications').textContent = data.length;
+                    document.getElementById('loading').style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('loading').innerHTML = '<p>Error loading applications</p>';
+                });
+        }
+
+        function displayApplications(applications) {
+            const tbody = document.getElementById('applicationsTableBody');
+            const noResults = document.getElementById('noResults');
+            
+            tbody.innerHTML = '';
+
+            if (applications.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+
+            applications.forEach(app => {
+                const date = new Date(app.applied_at).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${app.id}</td>
+                    <td><strong>${app.name}</strong></td>
+                    <td>${app.email}</td>
+                    <td>${app.mobile}</td>
+                    <td>${app.job_role}</td>
+                    <td>${date}</td>
+                    <td class="actions">
+                        <button class="btn-icon btn-view" onclick="viewApplication(${app.id})" title="View">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = allApplications.filter(app => 
+                app.name.toLowerCase().includes(searchTerm) ||
+                app.email.toLowerCase().includes(searchTerm) ||
+                app.job_role.toLowerCase().includes(searchTerm)
+            );
+            displayApplications(filtered);
+        });
+
+        // View application details
+        function viewApplication(appId) {
+            const app = allApplications.find(a => a.id === appId);
+            if (app) {
+                const date = new Date(app.applied_at).toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const details = `
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Full Name</label>
+                            <p>${app.name}</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Email</label>
+                            <p>${app.email}</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Mobile Number</label>
+                            <p>${app.mobile}</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Department</label>
+                            <p>${app.department}</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Job Role</label>
+                            <p>${app.job_role}</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Applied Date</label>
+                            <p>${date}</p>
+                        </div>
+                        <div class="detail-item full-width">
+                            <label>Message</label>
+                            <p>${app.message || 'No message provided'}</p>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('applicationDetails').innerHTML = details;
+                document.getElementById('viewModal').style.display = 'flex';
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('viewModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('viewModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - JobPortal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <!-- Admin Sidebar -->
+    <div class="admin-sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> JobPortal</a>
+            </div>
+            <span class="admin-badge">Admin</span>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="active">
+                <a href="/admin/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/add-job">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Job</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/manage-jobs">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Manage Jobs</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/applications">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Applications</span>
+                </a>
+            </li>
+            <li>
+                <a href="/">
+                    <i class="fas fa-home"></i>
+                    <span>View Site</span>
+                </a>
+            </li>
+            <li>
+                <a href="/logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Admin Content -->
+    <div class="admin-content">
+        <!-- Top Header -->
+        <div class="admin-header">
+            <h1>Dashboard</h1>
+            <div class="admin-user">
+                <span>Welcome, Admin</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon jobs">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ jobs_count }}</h3>
+                    <p>Total Jobs</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon companies">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ companies_count }}</h3>
+                    <p>Companies</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon applications">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ applications_count }}</h3>
+                    <p>Applications</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon users">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ users_count }}</h3>
+                    <p>Users</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Jobs -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Recent Jobs</h2>
+                <a href="/admin/manage-jobs" class="btn btn-sm">View All</a>
+            </div>
+            <div class="recent-jobs-list" id="recentJobs">
+                <!-- Jobs will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Recent Applications -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Recent Applications</h2>
+                <a href="/admin/applications" class="btn btn-sm">View All</a>
+            </div>
+            <div class="recent-applications-list" id="recentApplications">
+                <!-- Applications will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script>
+        // Load recent jobs
+        fetch('/api/jobs')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('recentJobs');
+                data.slice(0, 5).forEach(job => {
+                    container.innerHTML += `
+                        <div class="recent-item">
+                            <div class="item-info">
+                                <h4>${job.title}</h4>
+                                <p>${job.company} - ${job.location}</p>
+                            </div>
+                            <span class="item-type">${job.job_type}</span>
+                        </div>
+                    `;
+                });
+            });
+
+        // Load recent applications
+        fetch('/api/applications')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('recentApplications');
+                data.slice(0, 5).forEach(app => {
+                    container.innerHTML += `
+                        <div class="recent-item">
+                            <div class="item-info">
+                                <h4>${app.name}</h4>
+                                <p>${app.job_role} - ${app.email}</p>
+                            </div>
+                            <span class="item-date">${new Date(app.applied_at).toLocaleDateString()}</span>
+                        </div>
+                    `;
+                });
+            });
+    </script>
+</body>
+</html>
+

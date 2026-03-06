@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs - JobPortal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> JobPortal</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/jobs" class="active">Jobs</a></li>
+                <li><a href="/companies">Companies</a></li>
+                <li><a href="/#services">Services</a></li>
+                <li><a href="/#about">About</a></li>
+            </ul>
+            <div class="nav-buttons">
+                {% if session.get('user_id') %}
+                    <span class="welcome-text">Welcome, {{ session.get('user_name') }}</span>
+                    <a href="/logout" class="btn btn-outline">Logout</a>
+                {% else %}
+                    <a href="/login" class="btn btn-outline">Login</a>
+                    <a href="/register" class="btn btn-primary">Register</a>
+                {% endif %}
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Browse Jobs</h1>
+            <p>Find your dream job from thousands of opportunities</p>
+        </div>
+    </section>
+
+    <!-- Jobs Section -->
+    <section class="jobs-section">
+        <div class="container">
+            <!-- Search and Filter Bar -->
+            <div class="jobs-toolbar">
+                <div class="search-filter">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search by job title, keyword...">
+                    </div>
+                    <div class="location-filter">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="locationInput" placeholder="Location">
+                    </div>
+                    <button class="btn btn-primary" onclick="filterJobs()">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+                <div class="jobs-count">
+                    <span id="jobsCount">0</span> jobs found
+                </div>
+            </div>
+
+            <!-- Jobs List -->
+            <div class="jobs-list" id="jobsList">
+                <!-- Jobs will be loaded dynamically -->
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading jobs...
+            </div>
+
+            <!-- No Results State -->
+            <div class="no-results" id="noResults" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>No jobs found</h3>
+                <p>Try adjusting your search criteria</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> JobPortal</a>
+                    </div>
+                    <p>Your trusted partner in finding the perfect job.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/jobs">Jobs</a></li>
+                        <li><a href="/companies">Companies</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-envelope"></i> info@jobportal.com</li>
+                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 JobPortal. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jobs.js') }}"></script>
+</body>
+</html>
+
