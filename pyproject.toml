@@ -2,7 +2,7 @@
 name = "jobportal"
 version = "1.0.0"
 description = "Online Job Portal Website"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 
 [build-system]
 requires = ["hatchling"]
@@ -13,10 +13,7 @@ packages = ["backend"]
 
 [tool.vercel]
 output = "backend"
-pythonVersion = "3.9"
-
-[tool.vercel.build]
-command = "pip install -r requirements.txt"
+pythonVersion = "3.11"
 
 [project.scripts]
 app = "backend.app:app"
