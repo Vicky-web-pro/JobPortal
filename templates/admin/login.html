@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - JobPortal</title>
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Admin Login Specific Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_login.css') }}">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-login-body">
+    <!-- Admin Login Container -->
+    <div class="admin-login-container">
+        <!-- Left Side - Branding -->
+        <div class="admin-login-branding">
+            <div class="branding-content">
+                <div class="logo">
+                    <span class="logo-icon"><i class="fas fa-briefcase"></i></span>
+                    <span class="logo-text">JobPortal</span>
+                </div>
+                <h1>Admin Panel</h1>
+                <p>Manage your job portal efficiently. Add jobs, view applications, and manage companies all in one place.</p>
+                <div class="branding-features">
+                    <div class="feature">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Manage Jobs</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-file-alt"></i>
+                        <span>View Applications</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-building"></i>
+                        <span>Manage Companies</span>
+                    </div>
+                </div>
+            </div>
+            <div class="branding-decoration">
+                <div class="circle circle-1"></div>
+                <div class="circle circle-2"></div>
+                <div class="circle circle-3"></div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="admin-login-form-wrapper">
+            <div class="admin-login-box">
+                <div class="login-header">
+                    <div class="admin-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h2>Welcome Back</h2>
+                    <p>Enter your credentials to access the admin panel</p>
+                </div>
+
+                <!-- Error Message -->
+                {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <!-- Login Form -->
+                <form id="adminLoginForm" method="POST" action="/admin/login">
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Admin Email
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                placeholder="Enter your admin email"
+                                value="{{ email or '' }}"
+                                required
+                            >
+                            <i class="fas fa-envelope input-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                placeholder="Enter your password"
+                                required
+                            >
+                            <i class="fas fa-lock input-icon"></i>
+                            <button type="button" class="toggle-password" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" name="remember">
+                            <span class="checkmark"></span>
+                            Remember me
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login to Dashboard</span>
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    <a href="/" class="back-to-site">
+                        <i class="fas fa-arrow-left"></i> Back to Website
+                    </a>
+                </div>
+
+                <!-- Demo Credentials Info -->
+                <div class="demo-credentials">
+                    <h4><i class="fas fa-info-circle"></i> Demo Credentials</h4>
+                    <p>Email: <strong>admin@jobportal.com</strong></p>
+                    <p>Password: <strong>admin123</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Form validation
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                e.preventDefault();
+                alert('Please fill in all fields');
+            }
+        });
+
+        // Add animation on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.admin-login-container');
+            container.classList.add('loaded');
+        });
+    </script>
+</body>
+</html>
+

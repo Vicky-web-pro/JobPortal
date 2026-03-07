@@ -13,6 +13,7 @@ from functools import wraps
 # Import Flask and other dependencies
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import sqlite3
+import bcrypt
 
 # Flask app configuration
 app = Flask(__name__)
@@ -219,7 +220,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session or not session.get('is_admin'):
-            return redirect(url_for('login'))
+            return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -510,6 +511,88 @@ def get_applications():
         return jsonify({'error': 'Failed to fetch applications'}), 500
 
 # ==================== ADMIN ROUTES ====================
+
+# Admin Login Page
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    """
+    Admin login route with separate admin authentication.
+    This route handles the admin-specific login process.
+    """
+    try:
+        # If already logged in as admin, redirect to dashboard
+        if session.get('admin_logged_in') and session.get('is_admin'):
+            return redirect(url_for('admin_dashboard'))
+        
+        if request.method == 'POST':
+            email = request.form.get('email')
+            password = request.form.get('password')
+            
+            if not email or not password:
+                return render_template('admin/login.html', error='Please enter both email and password')
+            
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Get admin user by email
+            cursor.execute('SELECT * FROM users WHERE email = ? AND is_admin = 1', (email,))
+            user = cursor.fetchone()
+            
+            if user:
+                # Verify password with bcrypt
+                stored_password = user['password']
+                
+                # Check if password is hashed or plain text (for backward compatibility)
+                try:
+                    # Try bcrypt verification
+                    if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
+                        password_valid = True
+                    else:
+                        password_valid = False
+                except Exception:
+                    # Fallback for plain text passwords (legacy support)
+                    if stored_password == password:
+                        password_valid = True
+                        # Update to hashed password
+                        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+                        cursor.execute('UPDATE users SET password = ? WHERE id = ?', 
+                                     (hashed.decode('utf-8'), user['id']))
+                        conn.commit()
+                    else:
+                        password_valid = False
+                
+                if password_valid:
+                    # Set admin session
+                    session['user_id'] = user['id']
+                    session['user_name'] = user['name']
+                    session['is_admin'] = user['is_admin']
+                    session['admin_logged_in'] = True
+                    
+                    conn.close()
+                    return redirect(url_for('admin_dashboard'))
+            
+            conn.close()
+            return render_template('admin/login.html', error='Invalid admin credentials')
+        
+        return render_template('admin/login.html')
+    
+    except Exception as e:
+        print(f"Error in admin_login: {e}")
+        return render_template('admin/login.html', error='Server error occurred'), 500
+
+# Admin Logout - Separate route for proper session handling
+@app.route('/admin/logout')
+def admin_logout():
+    """
+    Admin logout route - clears admin session and redirects to login.
+    """
+    try:
+        # Clear all session data
+        session.clear()
+        return redirect(url_for('admin_login'))
+    except Exception as e:
+        print(f"Error in admin_logout: {e}")
+        return redirect(url_for('admin_login'))
 
 # Admin Dashboard
 @app.route('/admin/dashboard')
