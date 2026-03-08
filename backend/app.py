@@ -22,19 +22,34 @@ import bcrypt
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'job_portal_secret_key_2024')
 
-# Get the base directory
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Get the base directory - handle both local and Vercel environments
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Detect if running on Vercel
+IS_VERCEL = os.environ.get('VERCEL') == '1'
 
 # Database path - use /tmp on Vercel for ephemeral filesystem
 # In local development, use the local database
-if os.environ.get('VERCEL') == '1':
+if IS_VERCEL:
     DB_PATH = os.path.join('/tmp', 'database.db')
 else:
-    DB_PATH = os.path.join(BASE_DIR, 'backend', 'database.db')
+    DB_PATH = os.path.join(BASE_DIR, 'database.db')
 
 # Configure template and static folders
-app.template_folder = os.path.join(BASE_DIR, 'templates')
-app.static_folder = os.path.join(BASE_DIR, 'static')
+# For local development: use relative paths from backend/
+# For Vercel: use absolute paths to project root
+if IS_VERCEL:
+    # On Vercel, the project root is the parent of backend/
+    project_root = os.path.dirname(BASE_DIR)
+    template_dir = os.path.join(project_root, 'templates')
+    static_dir = os.path.join(project_root, 'static')
+else:
+    # Local development: templates and static in project root (parent of backend)
+    template_dir = os.path.join(os.path.dirname(BASE_DIR), 'templates')
+    static_dir = os.path.join(os.path.dirname(BASE_DIR), 'static')
+
+app.template_folder = template_dir
+app.static_folder = static_dir
 
 # Email configuration (configure these with your SMTP settings)
 # For demo purposes, we'll simulate email sending
@@ -854,99 +869,9 @@ def admin_applications():
         print(f"Error in admin_applications: {e}")
         return f"Error: {str(e)}", 500
 
-# ==================== VERCEL HANDLER ====================
-
-def handler(event, context):
-    """Vercel Python handler function."""
-    http_method = event.get('httpMethod', 'GET')
-    path = event.get('path', '/')
-    headers = event.get('headers', {})
-    query_params = event.get('queryStringParameters', {})
-    body = event.get('body', '')
-    
-    if body and headers.get('content-type') == 'application/json':
-        try:
-            body = json.loads(body)
-        except:
-            body = {}
-    
-    class MockRequest:
-        def __init__(self, method, path, headers, args, json):
-            self.method = method
-            self.path = path
-            self.headers = headers
-            self.args = args
-            self._json = json
-            self.form = {}
-            
-        def form_get(self, key, default=None):
-            if isinstance(self._json, dict):
-                return self._json.get(key, default)
-            return default
-            
-        def get(self, key, default=None):
-            if isinstance(self._json, dict):
-                return self._json.get(key, default)
-            return default
-            
-        @property
-        def json(self):
-            return self._json
-            
-        @property
-        def form(self):
-            if isinstance(self._json, dict):
-                return self._json
-            return {}
-    
-    mock_request = MockRequest(http_method, path, headers, query_params, body)
-    
-    if http_method == 'POST' and isinstance(body, dict):
-        for key, value in body.items():
-            mock_request.form[key] = value
-    
-    from flask import globals as flask_globals
-    flask_globals._request_ctx_stack.push(app.test_request_context(
-        path=path,
-        method=http_method,
-        headers=headers,
-        query_string='&'.join([f"{k}={v}" for k, v in (query_params or {}).items()])
-    ))
-    
-    try:
-        response = app.full_dispatch_request()
-        
-        status_code = response.status_code
-        response_headers = dict(response.headers)
-        response_body = response.get_data(as_text=True)
-        
-        return {
-            'statusCode': status_code,
-            'headers': response_headers,
-            'body': response_body
-        }
-    except Exception as e:
-        print(f"Handler error: {e}")
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Internal server error'})
-        }
-    finally:
-        flask_globals._request_ctx_stack.pop()
-
-# ==================== MAIN ====================
-
-if __name__ == '__main__':
-    # Initialize database (don't delete - keep existing data)
+# Initialize database on module load (for both local and Vercel)
+try:
     init_db()
-    # Only seed if empty
     seed_sample_data()
-    # Run the app
-    print("\n" + "="*50)
-    print("Job Portal Started Successfully!")
-    print("="*50)
-    print("Open your browser and go to: http://127.0.0.1:5000")
-    print("Admin Login: admin@jobportal.com / admin123")
-    print("="*50 + "\n")
-    app.run(debug=True)
+except Exception as e:
+    print(f"Database initialization warning: {e}")
