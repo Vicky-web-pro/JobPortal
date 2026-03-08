@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jobs - JobPortal</title>
+    <title>Jobs - CareerPoint</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,7 +15,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="logo">
-                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> JobPortal</a>
+                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> CareerPoint</a>
             </div>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
@@ -27,6 +27,7 @@
             <div class="nav-buttons">
                 {% if session.get('user_id') %}
                     <span class="welcome-text">Welcome, {{ session.get('user_name') }}</span>
+                    <a href="/my-applications" class="btn btn-primary">My Applications</a>
                     <a href="/logout" class="btn btn-outline">Logout</a>
                 {% else %}
                     <a href="/login" class="btn btn-outline">Login</a>
@@ -122,7 +123,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <div class="logo">
-                        <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> JobPortal</a>
+                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> CareerPoint</a>
                     </div>
                     <p>Your trusted partner in finding the perfect job.</p>
                     <div class="social-links">
@@ -147,7 +148,7 @@
                     </ul>
                 </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 JobPortal. All Rights Reserved.</p>
+<p>&copy; 2024 CareerPoint. All Rights Reserved.</p>
             </div>
     </footer>
 

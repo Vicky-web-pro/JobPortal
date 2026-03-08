@@ -3,20 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Applications - Admin - JobPortal</title>
+    <title>Applications - Admin - CareerPoint</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Status Badge Styles */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-badge.applied {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+        
+        .status-badge.shortlisted {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .status-badge.interview {
+            background: #ffedd5;
+            color: #ea580c;
+        }
+        
+        .status-badge.selected {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .status-badge.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        /* Status Dropdown */
+        .status-select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            background: white;
+        }
+        
+        .status-select.applied { border-color: #9ca3af; color: #4b5563; }
+        .status-select.shortlisted { border-color: #2563eb; color: #2563eb; }
+        .status-select.interview { border-color: #ea580c; color: #ea580c; }
+        .status-select.selected { border-color: #059669; color: #059669; }
+        .status-select.rejected { border-color: #dc2626; color: #dc2626; }
+        
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            background: #10b981;
+        }
+        
+        .toast.error {
+            background: #ef4444;
+        }
+        
+        /* Table Enhancements */
+        .admin-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .admin-table td {
+            vertical-align: middle;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .action-btn.update {
+            background: #667eea;
+            color: white;
+        }
+        
+        .action-btn.update:hover {
+            background: #5568d3;
+        }
+        
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-card .count {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .stat-card.applied .count { color: #6b7280; }
+        .stat-card.shortlisted .count { color: #2563eb; }
+        .stat-card.interview .count { color: #ea580c; }
+        .stat-card.selected .count { color: #059669; }
+        .stat-card.rejected .count { color: #dc2626; }
+        
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body class="admin-body">
     <!-- Admin Sidebar -->
     <div class="admin-sidebar">
         <div class="sidebar-header">
             <div class="logo">
-                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> JobPortal</a>
+                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> CareerPoint</a>
             </div>
             <span class="admin-badge">Admin</span>
         </div>
@@ -65,18 +242,54 @@
     <div class="admin-content">
         <!-- Top Header -->
         <div class="admin-header">
-            <h1>Job Applications</h1>
+            <h1><i class="fas fa-users"></i> Job Applications</h1>
             <div class="header-stats">
                 <span class="total-count">Total: <strong id="totalApplications">0</strong></span>
             </div>
         </div>
 
+        <!-- Stats Cards -->
+        <div class="stats-row">
+            <div class="stat-card applied">
+                <div class="count" id="countApplied">0</div>
+                <div class="label">Applied</div>
+            </div>
+            <div class="stat-card shortlisted">
+                <div class="count" id="countShortlisted">0</div>
+                <div class="label">Shortlisted</div>
+            </div>
+            <div class="stat-card interview">
+                <div class="count" id="countInterview">0</div>
+                <div class="label">Interview</div>
+            </div>
+            <div class="stat-card selected">
+                <div class="count" id="countSelected">0</div>
+                <div class="label">Selected</div>
+            </div>
+            <div class="stat-card rejected">
+                <div class="count" id="countRejected">0</div>
+                <div class="label">Rejected</div>
+            </div>
+        </div>
+
         <!-- Applications Table -->
         <div class="admin-table-container">
-            <div class="table-header">
-                <div class="search-box">
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label><i class="fas fa-filter"></i> Filter by Status:</label>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="Applied">Applied</option>
+                        <option value="Shortlisted">Shortlisted</option>
+                        <option value="Interview">Interview</option>
+                        <option value="Selected">Selected</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="search-box" style="flex: 1; max-width: 300px;">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search applications...">
+                    <input type="text" id="searchInput" placeholder="Search by name, email, job...">
                 </div>
             </div>
 
@@ -84,11 +297,12 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Mobile</th>
-                        <th>Job Role</th>
+                        <th>Applicant Name</th>
+                        <th>Job Title</th>
+                        <th>Company</th>
                         <th>Applied Date</th>
+                        <th>Current Status</th>
+                        <th>Update Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -125,13 +339,23 @@
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
     <script>
         let allApplications = [];
+        
+        // Recruitment statuses
+        const STATUSES = ['Applied', 'Shortlisted', 'Interview', 'Selected', 'Rejected'];
 
         // Load applications on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadApplications();
+            
+            // Filter event listeners
+            document.getElementById('statusFilter').addEventListener('change', filterApplications);
+            document.getElementById('searchInput').addEventListener('input', filterApplications);
         });
 
         function loadApplications() {
@@ -140,6 +364,7 @@
                 .then(data => {
                     allApplications = data;
                     displayApplications(data);
+                    updateStats(data);
                     document.getElementById('totalApplications').textContent = data.length;
                     document.getElementById('loading').style.display = 'none';
                 })
@@ -147,6 +372,51 @@
                     console.error('Error:', error);
                     document.getElementById('loading').innerHTML = '<p>Error loading applications</p>';
                 });
+        }
+
+        function updateStats(applications) {
+            const stats = {
+                'Applied': 0,
+                'Shortlisted': 0,
+                'Interview': 0,
+                'Selected': 0,
+                'Rejected': 0
+            };
+            
+            applications.forEach(app => {
+                const status = app.status || 'Applied';
+                if (stats.hasOwnProperty(status)) {
+                    stats[status]++;
+                }
+            });
+            
+            document.getElementById('countApplied').textContent = stats['Applied'];
+            document.getElementById('countShortlisted').textContent = stats['Shortlisted'];
+            document.getElementById('countInterview').textContent = stats['Interview'];
+            document.getElementById('countSelected').textContent = stats['Selected'];
+            document.getElementById('countRejected').textContent = stats['Rejected'];
+        }
+
+        function filterApplications() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = allApplications;
+            
+            if (statusFilter) {
+                filtered = filtered.filter(app => app.status === statusFilter);
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(app => 
+                    app.name.toLowerCase().includes(searchTerm) ||
+                    app.email.toLowerCase().includes(searchTerm) ||
+                    (app.job_role && app.job_role.toLowerCase().includes(searchTerm)) ||
+                    (app.company_name && app.company_name.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            displayApplications(filtered);
         }
 
         function displayApplications(applications) {
@@ -163,21 +433,34 @@
             noResults.style.display = 'none';
 
             applications.forEach(app => {
-                const date = new Date(app.applied_at).toLocaleDateString('en-GB', {
+                const appliedDate = app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-GB', {
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric'
-                });
+                }) : 'N/A';
+                
+                const currentStatus = app.status || 'Applied';
+                const statusClass = currentStatus.toLowerCase();
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${app.id}</td>
-                    <td><strong>${app.name}</strong></td>
-                    <td>${app.email}</td>
-                    <td>${app.mobile}</td>
-                    <td>${app.job_role}</td>
-                    <td>${date}</td>
-                    <td class="actions">
+                    <td>
+                        <strong>${app.name}</strong><br>
+                        <small style="color: #6b7280;">${app.email}</small>
+                    </td>
+                    <td>${app.job_role || 'N/A'}</td>
+                    <td>${app.company_name || 'N/A'}</td>
+                    <td>${appliedDate}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${currentStatus}</span>
+                    </td>
+                    <td>
+                        <select class="status-select ${statusClass}" id="status-${app.id}" onchange="updateStatus(${app.id})">
+                            ${STATUSES.map(status => `<option value="${status}" ${app.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>
                         <button class="btn-icon btn-view" onclick="viewApplication(${app.id})" title="View">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -187,28 +470,69 @@
             });
         }
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const filtered = allApplications.filter(app => 
-                app.name.toLowerCase().includes(searchTerm) ||
-                app.email.toLowerCase().includes(searchTerm) ||
-                app.job_role.toLowerCase().includes(searchTerm)
-            );
-            displayApplications(filtered);
-        });
+        // Update application status
+        function updateStatus(applicationId) {
+            const selectElement = document.getElementById(`status-${applicationId}`);
+            const newStatus = selectElement.value;
+            
+            fetch('/api/update-application-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    application_id: applicationId,
+                    status: newStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    showToast('Application status updated successfully!', 'success');
+                    
+                    // Update the application in local array
+                    const app = allApplications.find(a => a.id === applicationId);
+                    if (app) {
+                        app.status = newStatus;
+                    }
+                    
+                    // Update stats and display
+                    updateStats(allApplications);
+                    filterApplications();
+                } else if (data.error) {
+                    showToast(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error updating status', 'error');
+            });
+        }
+
+        // Show toast notification
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
 
         // View application details
         function viewApplication(appId) {
             const app = allApplications.find(a => a.id === appId);
             if (app) {
-                const date = new Date(app.applied_at).toLocaleString('en-GB', {
+                const appliedDate = app.applied_at ? new Date(app.applied_at).toLocaleString('en-GB', {
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
-                });
+                }) : 'N/A';
+
+                const statusClass = (app.status || 'Applied').toLowerCase();
 
                 const details = `
                     <div class="detail-grid">
@@ -233,8 +557,16 @@
                             <p>${app.job_role}</p>
                         </div>
                         <div class="detail-item">
+                            <label>Company</label>
+                            <p>${app.company_name || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
                             <label>Applied Date</label>
-                            <p>${date}</p>
+                            <p>${appliedDate}</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Current Status</label>
+                            <p><span class="status-badge ${statusClass}">${app.status || 'Applied'}</span></p>
                         </div>
                         <div class="detail-item full-width">
                             <label>Message</label>

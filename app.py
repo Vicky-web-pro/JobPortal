@@ -8,6 +8,7 @@ Running locally on localhost.
 
 import os
 import smtplib
+from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from functools import wraps
@@ -125,14 +126,17 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS applications (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
             name TEXT NOT NULL,
             email TEXT NOT NULL,
             mobile TEXT NOT NULL,
             department TEXT NOT NULL,
             job_role TEXT NOT NULL,
             job_id INTEGER,
+            company_name TEXT,
             resume TEXT,
             message TEXT,
+            status TEXT DEFAULT 'Pending',
             applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (job_id) REFERENCES jobs (id)
         )
@@ -444,13 +448,20 @@ def apply_for_job():
         if not data.get(field):
             return jsonify({'error': f'Missing required field: {field}'}), 400
     
+    # Get user_id from session if logged in
+    user_id = session.get('user_id')
+    
+    # Get current timestamp for applied_at
+    applied_at = datetime.now()
+    
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO applications (name, email, mobile, department, job_role, job_id, resume, message)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (data['name'], data['email'], data['mobile'], data['department'],
-          data['job_role'], data.get('job_id'), data.get('resume'), data.get('message')))
+        INSERT INTO applications (user_id, name, email, mobile, department, job_role, job_id, company_name, resume, message, applied_at, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (user_id, data['name'], data['email'], data['mobile'], data['department'],
+          data['job_role'], data.get('job_id'), data.get('company_name'), data.get('resume'), 
+          data.get('message'), applied_at, 'Applied'))
     conn.commit()
     
     job_title = data.get('job_title', data.get('job_role', 'Unknown Position'))
@@ -573,6 +584,73 @@ def admin_manage_jobs():
 @admin_required
 def admin_applications():
     return render_template('admin/applications.html')
+
+# ==================== USER DASHBOARD ROUTES ====================
+
+@app.route('/my-applications')
+@login_required
+def my_applications():
+    """User's job applications page - only for regular users, not admins"""
+    
+    # Redirect admins to admin dashboard - My Applications is for users only
+    if session.get('is_admin'):
+        return redirect(url_for('admin_dashboard'))
+    
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT a.*, j.title as job_title, j.location as job_location, j.salary as job_salary
+        FROM applications a
+        LEFT JOIN jobs j ON a.job_id = j.id
+        WHERE a.user_id = ?
+        ORDER BY a.applied_at DESC
+    ''', (user_id,))
+    applications = cursor.fetchall()
+    conn.close()
+    
+    # Convert date strings to datetime objects for strftime in template
+    applications_list = []
+    for app in applications:
+        app_dict = dict(app)
+        if app_dict.get('applied_at'):
+            try:
+                app_dict['applied_at'] = datetime.strptime(app_dict['applied_at'], '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                # If date format is different, try parsing with just date part
+                try:
+                    app_dict['applied_at'] = datetime.strptime(app_dict['applied_at'][:10], '%Y-%m-%d')
+                except ValueError:
+                    pass  # Keep original string if parsing fails
+        applications_list.append(app_dict)
+    
+    return render_template('my_applications.html', applications=applications_list)
+
+# ==================== API FOR STATUS UPDATE ====================
+
+@app.route('/api/update-application-status', methods=['POST'])
+@admin_required
+def update_application_status():
+    """API endpoint for admin to update application status"""
+    data = request.json
+    application_id = data.get('application_id')
+    new_status = data.get('status')
+    
+    if not application_id or not new_status:
+        return jsonify({'error': 'Missing required fields'}), 400
+    
+    # New recruitment status workflow
+    valid_statuses = ['Applied', 'Shortlisted', 'Interview', 'Selected', 'Rejected']
+    if new_status not in valid_statuses:
+        return jsonify({'error': 'Invalid status value'}), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE applications SET status = ? WHERE id = ?', (new_status, application_id))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Status updated successfully', 'status': new_status})
 
 # ==================== MAIN ====================
 
