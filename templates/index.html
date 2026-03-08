@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerPoint</title>
+    <title>CareerPoint - Find Your Dream Job</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,7 +15,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="logo">
-                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> JobPortal</a>
+                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> CareerPoint</a>
             </div>
             <ul class="nav-links">
                 <li><a href="/" class="active">Home</a></li>
@@ -27,6 +27,7 @@
             <div class="nav-buttons">
                 {% if session.get('user_id') %}
                     <span class="welcome-text">Welcome, {{ session.get('user_name') }}</span>
+                    <a href="/my-applications" class="btn btn-primary">My Applications</a>
                     <a href="/logout" class="btn btn-outline">Logout</a>
                 {% else %}
                     <a href="/login" class="btn btn-outline">Login</a>
@@ -156,8 +157,8 @@
         <div class="container">
             <div class="about-content">
                 <div class="about-text">
-                    <h2>About JobPortal</h2>
-                    <p>JobPortal is a leading online job board connecting job seekers with top employers. We bridge the gap between talented professionals and world-class organizations.</p>
+<h2>About CareerPoint</h2>
+                    <p>CareerPoint is a leading online job board connecting job seekers with top employers. We bridge the gap between talented professionals and world-class organizations.</p>
                     <p>Our mission is to make job searching simple, efficient, and effective. With thousands of job listings across various industries, we help you find the perfect career opportunity.</p>
                     <ul class="about-features">
                         <li><i class="fas fa-check-circle"></i> User-friendly interface</li>
@@ -167,7 +168,7 @@
                     </ul>
                 </div>
                 <div class="about-image">
-                    <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=600" alt="About JobPortal">
+<img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=600" alt="About CareerPoint">
                 </div>
             </div>
         </div>
@@ -178,8 +179,8 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <div class="logo">
-                        <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> JobPortal</a>
+<div class="logo">
+                        <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> CareerPoint</a>
                     </div>
                     <p>Your trusted partner in finding the perfect job. Connect with top companies and advance your career.</p>
                     <div class="social-links">
@@ -217,7 +218,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 JobPortal. All Rights Reserved.</p>
+<p>&copy; 2024 CareerPoint. All Rights Reserved.</p>
             </div>
         </div>
     </footer>

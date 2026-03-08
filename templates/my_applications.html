@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications - CareerPoint</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* My Applications Page Styles */
+        .dashboard-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            padding: 40px 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card .count {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Status Colors */
+        .stat-card.applied .count { color: #6b7280; }
+        .stat-card.shortlisted .count { color: #2563eb; }
+        .stat-card.interview .count { color: #ea580c; }
+        .stat-card.selected .count { color: #059669; }
+        .stat-card.rejected .count { color: #dc2626; }
+
+        /* Applications Table */
+        .applications-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Table Styles */
+        .applications-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .applications-table th,
+        .applications-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .applications-table th {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f9fafb;
+        }
+
+        .applications-table td {
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .applications-table tr:hover {
+            background: #f9fafb;
+        }
+
+        /* Job Info */
+        .job-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .job-info p {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        /* Status Badges - New Design */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.applied {
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+        }
+
+        .status-badge.shortlisted {
+            background: #dbeafe;
+            color: #2563eb;
+            border: 1px solid #93c5fd;
+        }
+
+        .status-badge.interview {
+            background: #ffedd5;
+            color: #ea580c;
+            border: 1px solid #fdba74;
+        }
+
+        .status-badge.selected {
+            background: #d1fae5;
+            color: #059669;
+            border: 1px solid #6ee7b7;
+        }
+
+        .status-badge.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        /* Date */
+        .date-info {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .date-info i {
+            margin-right: 5px;
+            color: #9ca3af;
+        }
+
+        /* Timeline */
+        .recruitment-timeline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+
+        .timeline-step.active {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .timeline-step.completed {
+            color: #10b981;
+        }
+
+        .timeline-step.rejected {
+            color: #dc2626;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .applications-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .dashboard-page {
+                padding: 20px 15px;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="/"><span class="logo-icon"><i class="fas fa-briefcase"></i></span> CareerPoint</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/jobs">Jobs</a></li>
+                <li><a href="/companies">Companies</a></li>
+            </ul>
+            <div class="nav-buttons">
+                {% if session.get('user_id') %}
+                    <span class="welcome-text">Welcome, {{ session.get('user_name') }}</span>
+                    <a href="/my-applications" class="btn btn-primary">My Applications</a>
+                    <a href="/logout" class="btn btn-outline">Logout</a>
+                {% else %}
+                    <a href="/login" class="btn btn-outline">Login</a>
+                    <a href="/register" class="btn btn-primary">Register</a>
+                {% endif %}
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Page -->
+    <div class="dashboard-page">
+        <div class="dashboard-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-file-alt"></i> My Applications</h1>
+                <p>Track the status of your job applications</p>
+            </div>
+
+            <!-- Stats Row -->
+            {% set applied_count = applications|selectattr('status', 'equalto', 'Applied')|list|length %}
+            {% set shortlisted_count = applications|selectattr('status', 'equalto', 'Shortlisted')|list|length %}
+            {% set interview_count = applications|selectattr('status', 'equalto', 'Interview')|list|length %}
+            {% set selected_count = applications|selectattr('status', 'equalto', 'Selected')|list|length %}
+            {% set rejected_count = applications|selectattr('status', 'equalto', 'Rejected')|list|length %}
+            
+            <div class="stats-row">
+                <div class="stat-card applied">
+                    <div class="count">{{ applied_count }}</div>
+                    <div class="label">Applied</div>
+                </div>
+                <div class="stat-card shortlisted">
+                    <div class="count">{{ shortlisted_count }}</div>
+                    <div class="label">Shortlisted</div>
+                </div>
+                <div class="stat-card interview">
+                    <div class="count">{{ interview_count }}</div>
+                    <div class="label">Interview</div>
+                </div>
+                <div class="stat-card selected">
+                    <div class="count">{{ selected_count }}</div>
+                    <div class="label">Selected</div>
+                </div>
+                <div class="stat-card rejected">
+                    <div class="count">{{ rejected_count }}</div>
+                    <div class="label">Rejected</div>
+                </div>
+            </div>
+
+            <!-- Applications Card -->
+            <div class="applications-card">
+                <div class="card-header">
+                    <h2>All Applications</h2>
+                    <a href="/jobs" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Browse More Jobs
+                    </a>
+                </div>
+
+                {% if applications %}
+                <table class="applications-table">
+                    <thead>
+                        <tr>
+                            <th>Job Title</th>
+                            <th>Company</th>
+                            <th>Applied Date</th>
+                            <th>Recruitment Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td>
+                                <div class="job-info">
+                                    <h4>{{ app.job_role }}</h4>
+                                    <p>{{ app.department }}</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="job-info">
+                                    <h4>{{ app.company_name or 'N/A' }}</h4>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-info">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ app.applied_at.strftime('%d %b %Y') if app.applied_at else 'N/A' }}
+                                </div>
+                            </td>
+                            <td>
+                                {% set status = app.status or 'Applied' %}
+                                <span class="status-badge {{ status|lower }}">
+                                    {% if status == 'Applied' %}
+                                        <i class="fas fa-paper-plane"></i>
+                                    {% elif status == 'Shortlisted' %}
+                                        <i class="fas fa-check-circle"></i>
+                                    {% elif status == 'Interview' %}
+                                        <i class="fas fa-comments"></i>
+                                    {% elif status == 'Selected' %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif status == 'Rejected' %}
+                                        <i class="fas fa-times-circle"></i>
+                                    {% endif %}
+                                    {{ status }}
+                                </span>
+                                <!-- Recruitment Timeline -->
+                                <div class="recruitment-timeline">
+                                    <span class="timeline-step {% if status in ['Applied', 'Shortlisted', 'Interview', 'Selected'] %}completed{% elif status == 'Applied' %}active{% endif %}">
+                                        <i class="fas fa-circle"></i>
+                                    </span>
+                                    <span class="timeline-step {% if status in ['Shortlisted', 'Interview', 'Selected'] %}completed{% elif status == 'Shortlisted' %}active{% endif %}">
+                                        <i class="fas fa-circle"></i>
+                                    </span>
+                                    <span class="timeline-step {% if status in ['Interview', 'Selected'] %}completed{% elif status == 'Interview' %}active{% endif %}">
+                                        <i class="fas fa-circle"></i>
+                                    </span>
+                                    <span class="timeline-step {% if status == 'Selected' %}completed{% elif status == 'Rejected' %}rejected{% endif %}">
+                                        <i class="fas fa-circle"></i>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-briefcase"></i>
+                    <h3>No Applications Yet</h3>
+                    <p>You haven't applied for any jobs yet. Start exploring and apply for your dream job!</p>
+                    <a href="/jobs" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Browse Jobs
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+
