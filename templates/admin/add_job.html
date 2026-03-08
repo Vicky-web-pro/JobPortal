@@ -70,142 +70,154 @@
                 <span>Welcome, Admin</span>
                 <i class="fas fa-user-circle"></i>
             </div>
-        </div>
 
         <!-- Add Job Form -->
         <div class="admin-form-container">
             <!-- Success Message -->
             <div class="alert alert-success" id="successMessage" style="display: none;">
-                <i class="fas fa-check-circle"></i> Job added successfully!
+                <i class="fas fa-check-circle"></i> 
+                <span id="successText">Job Successfully Posted!</span>
             </div>
 
             <!-- Error Message -->
             <div class="alert alert-danger" id="errorMessage" style="display: none;">
-                <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
+                <i class="fas fa-exclamation-circle"></i> 
+                <span id="errorText"></span>
             </div>
 
-            <form id="addJobForm" class="admin-form">
-                <div class="form-section">
-                    <h3>Job Details</h3>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="title">
-                                <i class="fas fa-briefcase"></i> Job Title *
-                            </label>
-                            <input type="text" id="title" name="title" placeholder="e.g. Software Developer" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="company">
-                                <i class="fas fa-building"></i> Company Name *
-                            </label>
-                            <input type="text" id="company" name="company" placeholder="e.g. Google" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="department">
-                                <i class="fas fa-layer-group"></i> Department *
-                            </label>
-                            <select id="department" name="department" required>
-                                <option value="">Select Department</option>
-                                <option value="Engineering">Engineering</option>
-                                <option value="Design">Design</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Sales">Sales</option>
-                                <option value="Analytics">Analytics</option>
-                                <option value="HR">HR</option>
-                                <option value="Finance">Finance</option>
-                                <option value="Operations">Operations</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="job_role">
-                                <i class="fas fa-user-tie"></i> Job Role *
-                            </label>
-                            <input type="text" id="job_role" name="job_role" placeholder="e.g. Senior Developer" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="location">
-                                <i class="fas fa-map-marker-alt"></i> Location *
-                            </label>
-                            <input type="text" id="location" name="location" placeholder="e.g. Bangalore, Karnataka" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="job_type">
-                                <i class="fas fa-clock"></i> Job Type *
-                            </label>
-                            <select id="job_type" name="job_type" required>
-                                <option value="">Select Job Type</option>
-                                <option value="Full Time">Full Time</option>
-                                <option value="Part Time">Part Time</option>
-                                <option value="Contract">Contract</option>
-                                <option value="Internship">Internship</option>
-                                <option value="Freelance">Freelance</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="salary">
-                                <i class="fas fa-money-b-wave"></i> Salary *
-                            </label>
-                            <input type="text" id="salary" name="salary" placeholder="e.g. ₹10,00,000 - ₹15,00,000" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="company_email">
-                                <i class="fas fa-envelope"></i> Company Email *
-                            </label>
-                            <input type="email" id="company_email" name="company_email" placeholder="e.g. careers@company.com" required>
-                        </div>
+            <!-- Job Form -->
+            <form id="addJobForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="title">
+                            <i class="fas fa-briefcase"></i> Job Title *
+                        </label>
+                        <input type="text" id="title" name="title" placeholder="e.g. Software Developer" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="description">
-                            <i class="fas fa-align-left"></i> Job Description
+                        <label for="company">
+                            <i class="fas fa-building"></i> Company Name *
                         </label>
-                        <textarea id="description" name="description" rows="6" placeholder="Enter job description..."></textarea>
+                        <input type="text" id="company" name="company" placeholder="e.g. Google" required>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="department">
+                            <i class="fas fa-layer-group"></i> Department *
+                        </label>
+                        <select id="department" name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Software Development">Software Development</option>
+                            <option value="Data Science">Data Science</option>
+                            <option value="Artificial Intelligence">Artificial Intelligence</option>
+                            <option value="Cyber Security">Cyber Security</option>
+                            <option value="Cloud Computing">Cloud Computing</option>
+                            <option value="Web Development">Web Development</option>
+                            <option value="UI/UX Design">UI/UX Design</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Human Resources">Human Resources</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Business Analytics">Business Analytics</option>
+                            <option value="DevOps">DevOps</option>
+                            <option value="Networking">Networking</option>
+                            <option value="Customer Support">Customer Support</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="job_role">
+                            <i class="fas fa-user-tie"></i> Job Role *
+                        </label>
+                        <input type="text" id="job_role" name="job_role" placeholder="e.g. Senior Developer" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location">
+                            <i class="fas fa-map-marker-alt"></i> Location *
+                        </label>
+                        <input type="text" id="location" name="location" placeholder="e.g. Bangalore, Karnataka" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="salary">
+                            <i class="fas fa-money-bwave"></i> Salary *
+                        </label>
+                        <input type="text" id="salary" name="salary" placeholder="e.g. ₹10,00,000 - ₹15,00,000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="job_type">
+                            <i class="fas fa-clock"></i> Job Type *
+                        </label>
+                        <select id="job_type" name="job_type" required>
+                            <option value="">Select Job Type</option>
+                            <option value="Full Time">Full Time</option>
+                            <option value="Part Time">Part Time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Freelance">Freelance</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="company_email">
+                            <i class="fas fa-envelope"></i> Company Email *
+                        </label>
+                        <input type="email" id="company_email" name="company_email" placeholder="e.g. careers@company.com" required>
+                    </div>
+                
+                <div class="form-group full-width">
+                    <label for="description">
+                        <i class="fas fa-align-left"></i> Job Description
+                    </label>
+                    <textarea id="description" name="description" rows="5" placeholder="Enter job description..."></textarea>
                 </div>
                 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Add Job
                     </button>
+                    <a href="/admin/manage-jobs" class="btn btn-outline">
+                        <i class="fas fa-list"></i> View All Jobs
+                    </a>
                     <a href="/admin/dashboard" class="btn btn-outline">
                         <i class="fas fa-arrow-left"></i> Back to Dashboard
                     </a>
                 </div>
             </form>
         </div>
-    </div>
 
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
     <script>
         document.getElementById('addJobForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Collect form data
             const formData = {
                 title: document.getElementById('title').value,
                 company: document.getElementById('company').value,
                 department: document.getElementById('department').value,
                 job_role: document.getElementById('job_role').value,
                 location: document.getElementById('location').value,
-                job_type: document.getElementById('job_type').value,
                 salary: document.getElementById('salary').value,
+                job_type: document.getElementById('job_type').value,
                 company_email: document.getElementById('company_email').value,
                 description: document.getElementById('description').value
             };
 
+            // Validate required fields
+            if (!formData.title || !formData.company || !formData.department || 
+                !formData.job_role || !formData.location || !formData.salary || 
+                !formData.job_type || !formData.company_email) {
+                document.getElementById('errorText').textContent = 'Please fill in all required fields';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+                return;
+            }
+
+            // Send API request
             fetch('/api/add-job', {
                 method: 'POST',
                 headers: {
@@ -216,22 +228,51 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
+                    // Show success message
+                    document.getElementById('successText').textContent = 'Job Successfully Posted!';
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
+                    
+                    // Reset form
                     document.getElementById('addJobForm').reset();
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
                     
                     // Redirect after 2 seconds
                     setTimeout(function() {
                         window.location.href = '/admin/manage-jobs';
-                    }, 1500);
+                    }, 2000);
+                } else {
+                    document.getElementById('errorText').textContent = data.error || 'Failed to add job';
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('successMessage').style.display = 'none';
                 }
             })
             .catch(error => {
                 document.getElementById('errorText').textContent = 'Something went wrong. Please try again.';
                 document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
             });
         });
     </script>
+    
+    <style>
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </body>
 </html>
-
