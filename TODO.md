@@ -1,28 +1,25 @@
-# Implementation TODO - Recruitment Status System
+# Job Portal - TODO List
 
-## Status: ✅ COMPLETED
+## Current Tasks
 
-### Step 1: Update app.py
-- [x] Modify apply_for_job to set default status as 'Applied'
-- [x] Update update_application_status API with new statuses
-- [x] Ensure applied_at is properly set
+### 1. Fix Apply Job Form UI Issue
+- [x] Read and understand the current apply.html structure
+- [x] Read the Flask backend (app.py) to verify file handling
+- [x] Fix the apply.html form structure - replace custom file upload with Bootstrap form-group
+- [x] Ensure Email input only contains email text field
+- [x] Create proper Resume Upload field with Bootstrap styling
+m - [x] Test the file upload functionality
 
-### Step 2: Update templates/admin/applications.html
-- [x] Add status filter dropdown
-- [x] Add "Update Status" column with dropdown
-- [x] Show Applied Date column properly
-- [x] Add status update functionality
+### 2. Apply Job Form Requirements
+- [x] Move Resume Upload input to correct section
+- [x] Use proper Bootstrap classes (form-group, form-control)v bhjn n
+- [x] Keep enctype="multipart/form-data" for file uploads
+- [x] Verify Flask route handles resume file: `resume = request.files['resume']`
 
-### Step 3: Update templates/my_applications.html
-- [x] Update status badge colors for new statuses
-- [x] Ensure Applied Date is displayed properly
-
-### Step 4: Update static/js/admin.js
-- [x] Add function to handle status updates
-- [x] Add status filter functionality
-
-### Step 5: Database Migration
-- [x] Run migration to update existing statuses (migrate_status.py)
-
-## Completion: 5/5 steps done ✅
+## Completed
+- [x] Initial analysis of project structure
+- [x] Read apply.html template
+- [x] Read app.py backend code
+- [x] Updated apply.html with proper form structure
+- [x] Verified uploads folder exists
 
